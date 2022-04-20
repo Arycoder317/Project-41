@@ -1,59 +1,58 @@
+
 const Engine = Matter.Engine;
 const World = Matter.World;
 const Bodies = Matter.Bodies;
-const Constraint = Matter.Constraint;
+const Body = Matter.Body;
 
-var engine, world;
-var canvas;
-var palyer, playerBase, playerArcher;
-var baseimage;
 
-function preload() {
-  backgroundImg = loadImage("./assets/background.png");
-  baseimage = loadImage("./assets/base.png");
-  playerimage = loadImage("./assets/player.png");
+var ball, ground, groundObj, leftSide, rightSide, engine;
+var world, radius=40
+
+function preload()
+{
+	
 }
 
 function setup() {
-  canvas = createCanvas(windowWidth, windowHeight);
+	createCanvas(1500,1500);
 
-  engine = Engine.create();
-  world = engine.world;
-  angleMode(DEGREES);
 
-  var options = {
-    isStatic: true
-  };
+	engine = Engine.create();
+	world = engine.world;
 
-  playerBase = Bodies.rectangle(200, 350, 180, 150, options);
-  World.add(world, playerBase);
 
-  player = Bodies.rectangle(250, playerBase.position.y - 160, 50, 180, options);
-  World.add(world,player)
+	var ball_options={
+		isStatic:false,
+		restitution:0.3,
+		friction:0,
+		density:1.2
+	}
 
- // playerArcher = new ( 340, playerBase.position.y - 112, 120, 120);
- playerArcher = new PlayerArcher( 340, playerBase.position.y - 112, 120, 120);
- 
- 
+	//Create the Bodies Here.
+	ball = Bodies.circle(260,100, radius/2, ball_options)
+	World.add(world,ball)
+	groundObj = new ground(width/2,670,width,20)
+	leftSide = new ground(1100,600,20,120);
+	rightSide = new ground(1300,600,20,120);
 
+	Engine.run(engine);
+  
 }
+
 
 function draw() {
-  background(backgroundImg);
-  image(baseimage,playerBase.position.x,playerBase.position.y,180,150)
-  image(playerimage,player.position.x,player.position.y,50,180)
+  rectMode(CENTER);
+  background(0);
 
-  Engine.update(engine);
-
-
-  // playerArcher.display;
-
-   playerArcher.display();
-  // display();
-
-  // Title
-  fill("#FFFF");
-  textAlign("center");
-  textSize(40);
-  text("EPIC ARCHERY", width / 2, 100);
+  groundObj.display()
+  leftSide.display()
+  rightSide.display()
+ellipse(ball.position.x, ball.position.y, radius, radius);
 }
+
+  function keypressed(){
+	  if (keyCode === UP_ARROW){
+		  Matter.Body.applyForce(ball,ball.position,{x:85, y:-85})
+	  }
+
+  }
