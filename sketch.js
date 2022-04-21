@@ -1,58 +1,73 @@
-
 const Engine = Matter.Engine;
 const World = Matter.World;
 const Bodies = Matter.Bodies;
-const Body = Matter.Body;
+const Constraint = Matter.Constraint;
 
+var engine, world;
+var canvas;
+var palyer, playerBase, playerArcher;
+var arrow;
+var baseimage;
+var playerimage;
 
-var ball, ground, groundObj, leftSide, rightSide, engine;
-var world, radius=40
-
-function preload()
-{
-	
+function preload() {
+  backgroundImg = loadImage("./assets/background.png");
+  baseimage = loadImage("./assets/base.png");
+  playerimage = loadImage("./assets/player.png");
 }
 
 function setup() {
-	createCanvas(1500,1500);
+  canvas = createCanvas(windowWidth, windowHeight);
 
+  engine = Engine.create();
+  world = engine.world;
 
-	engine = Engine.create();
-	world = engine.world;
+  angleMode(DEGREES);
 
+  var options = {
+    isStatic: true
+  };
 
-	var ball_options={
-		isStatic:false,
-		restitution:0.3,
-		friction:0,
-		density:1.2
-	}
+  playerBase = Bodies.rectangle(200, 350, 180, 150, options);
+  World.add(world, playerBase);
 
-	//Create the Bodies Here.
-	ball = Bodies.circle(260,100, radius/2, ball_options)
-	World.add(world,ball)
-	groundObj = new ground(width/2,670,width,20)
-	leftSide = new ground(1100,600,20,120);
-	rightSide = new ground(1300,600,20,120);
+  player = Bodies.rectangle(250, playerBase.position.y - 160, 50, 180, options);
+  World.add(world,player)
 
-	Engine.run(engine);
-  
+  playerArcher = new PlayerArcher(
+    340,
+    playerBase.position.y - 112,
+    120,
+    120
+  );
+
+  arrow = new PlayerArrow(
+    playerArcher.body.position.x,
+    playerArcher.body.position.y,
+    100,
+    10
+  );
 }
-
 
 function draw() {
-  rectMode(CENTER);
-  background(0);
+  background(backgroundImg);
+  image(baseimage,playerBase.position.x,playerBase.position.y,180,150)
+  image(playerimage,player.position.x,player.position.y,50,180)
+  Engine.update(engine);
 
-  groundObj.display()
-  leftSide.display()
-  rightSide.display()
-ellipse(ball.position.x, ball.position.y, radius, radius);
-}
+  playerArcher.display();
+  arrow.display();
 
-  function keypressed(){
-	  if (keyCode === UP_ARROW){
-		  Matter.Body.applyForce(ball,ball.position,{x:85, y:-85})
-	  }
-
+  if (keyCode === 32) {
+    // arrow.(playerArcher.body.angle);
+   //arrow.shoot(playerArcher.angle);
+    arrow.shoot(playerArcher.body.angle);
+    //arrow.shoot(playerArcher);
   }
+
+  // Title
+  fill("#FFFF");
+  textAlign("center");
+  textSize(40);
+  text("EPIC ARCHERY", width / 2, 100);
+}
