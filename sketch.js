@@ -49,26 +49,11 @@ function draw() {
     if (playerArrows[i] !== undefined) {
       playerArrows[i].display();
 
-       var board1Collision = Matter.SAT.collides(
+      var board1Collision = Matter.SAT.collides(
         board1.body,
         playerArrows[i].body
-      ); 
+      );
 
-      /* var board1Collision = collides(
-        board1.body,
-        playerArrows[i].body
-      ); */
-
-      /* var board1Collision = SAT.collides(
-        board1.body,
-        playerArrows[i].body
-      ); */
-
-      /* var board1Collision = Matter(
-        board1.body,
-        playerArrows[i].body
-      ); */
-      
       var board2Collision = Matter.SAT.collides(
         board2.body,
         playerArrows[i].body
@@ -84,6 +69,8 @@ function draw() {
       if (posX > width || posY > height) {
         if (!playerArrows[i].isRemoved) {
           playerArrows[i].remove(i);
+        } else {
+          playerArrows[i].trajectory = [];
         }
       }
     }
@@ -111,6 +98,8 @@ function keyPressed() {
 
       var arrow = new PlayerArrow(posX, posY, 100, 10, angle);
 
+      arrow.trajectory = [];
+      
       Matter.Body.setAngle(arrow.body, angle);
       playerArrows.push(arrow);
       numberOfArrows -= 1;
