@@ -13,19 +13,19 @@ var ground, bridge;
 var leftWall, rightWall;
 var jointPoint;
 var jointLink;
-var zombie;
-var zombie1, zombie2, zombie3, zombie4;
+var zombie1, zombie2, zombie3, zombie4, sadzombie;
 var breakButton;
 var backgroundImage;
 
 var stones = [];
-
+var collided = false;
 function preload() {
   zombie1 = loadImage("./assets/zombie1.png");
   zombie2 = loadImage("./assets/zombie2.png");
 
   zombie3 = loadImage("./assets/zombie3.png");
   zombie4 = loadImage("./assets/zombie4.png");
+  sadzombie = loadImage("./assets/sad_zombie.png");
 
   backgroundImage = loadImage("./assets/background.png");
 }
@@ -53,22 +53,18 @@ function setup() {
     stones.push(stone);
   }
 
-  zombie = createSprite(width / 2, height - 110);
+  zombie = createSprite(width / 2, height - 100, 50, 50);
   zombie.addAnimation("lefttoright", zombie1, zombie2, zombie1);
   zombie.addAnimation("righttoleft", zombie3, zombie4, zombie3);
+  zombie.addImage("sad", sadzombie);
+
   zombie.scale = 0.1;
   zombie.velocityX = 10;
 
   breakButton = createButton("");
   breakButton.position(width - 200, height / 2 - 50);
   breakButton.class("breakbutton");
-
-  //breakButton.mouseClicked(handleButtonPress);
   breakButton.mousePressed(handleButtonPress);
-  //breakButton.mouse(handleButtonPress);
-  //breakButton.mousePressed(ButtonPress);
-
-
 }
 
 function draw() {
@@ -79,14 +75,50 @@ function draw() {
 
   for (var stone of stones) {
     stone.show();
+    var pos = stone.body.position;
+    
+    var distance = dist(zombie.position.x, zombie.position.y, pos.x, pos.y);
+    //var distance = dist(zombie.position.x, zombie.position.y);
+    //var distance = dist(pos.x, pos.y);
+    //var distance = dist(zombie, pos);
+
+
+    /*if (distance >= 50) {
+      zombie.velocityX = 0;
+      Matter.Body.setVelocity(stone.body, { x: 10, y: -10 });
+      zombie.changeImage("sad");
+      collided = true;
+    }*/
+
+    /*if (distance <= 50) {
+      zombie.velocityX = 0;
+      Matter.Body.setVelocity(stone.body, { x: 10, y: -10 });
+      zombie.Image("sad");
+      collided = true;
+    }*/
+
+    if (distance <= 50) {
+      zombie.velocityX = 0;
+      Matter.Body.setVelocity(stone.body, { x: 10, y: -10 });
+      zombie.changeImage("sad");
+      collided = true;
+    }
+
+    /*if (distance <= 50) {
+      zombie.velocityX = 0;
+      Matter.Body.Velocity(stone.body, { x: 10, y: -10 });
+      zombie.changeImage("sad");
+      collided = true;
+    }*/
+
   }
 
-  if (zombie.position.x >= width - 300) {
+  if (zombie.position.x >= width - 300 && !collided) {
     zombie.velocityX = -10;
     zombie.changeAnimation("righttoleft");
   }
 
-  if (zombie.position.x <= 300) {
+  if (zombie.position.x <= 300 && !collided) {
     zombie.velocityX = 10;
     zombie.changeAnimation("lefttoright");
   }
@@ -95,17 +127,8 @@ function draw() {
 }
 
 function handleButtonPress() {
-  /* jointLink=dettach();
+  jointLink.dettach();
   setTimeout(() => {
     bridge.break();
-  }, 1500); */
-
- 
-
-
-   jointLink.dettach();
-  setTimeout(() => {
-    bridge.break();
-  }, 1500); 
+  }, 1500);
 }
-
