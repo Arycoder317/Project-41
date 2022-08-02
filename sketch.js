@@ -1,87 +1,94 @@
-const Engine = Matter.Engine;
-const World = Matter.World;
-const Bodies = Matter.Bodies;
-const Body = Matter.Body;
+var balloon,balloonImage1,balloonImage2;
+var database;
+var height;
 
-
-var ball
-var ball_img
-var cup
-var cup_img
-var glove
-var glove_img
-var backgroundimg
-
-
-
-
-
-
-
-function preload() {
-  ball_img = loadImage("ball.png")
-  cup_img = loadImage("cup.png")
-  glove_img = loadImage("glove.png")
-  backgroundimg = loadImage("background.png")
-}
-
-function setup() {
-  createCanvas(800,400);
-  frameRate(80);
-  engine = Engine.create();
-  world = engine.world;
-
-
-
-
-  var ball_options = {
-    restitution:0.95,
-    frictionAir:0.01
+function preload(){
+   bg =loadImage("Images/cityImage.png");
+   balloonImage1=loadAnimation("Images/HotAirBallon01.png");
+   balloonImage2=loadAnimation("Images/HotAirBallon01.png","Images/HotAirBallon01.png",
+   "Images/HotAirBallon01.png","Images/HotAirBallon02.png","Images/HotAirBallon02.png",
+   "Images/HotAirBallon02.png","Images/HotAirBallon03.png","Images/HotAirBallon03.png","Images/HotAirBallon03.png");
   }
 
+//Function to set initial environment
+function setup() {
+
+   database=firebase.database();
+
+  createCanvas(1500,700);
+
+  balloon=createSprite(250,650,150,150);
+  balloon.addAnimation("hotAirBalloon",balloonImage1);
+  balloon.scale=0.5;
+
+  var balloonHeight=database.ref('balloon/height');
+  balloonHeight.on("value",readHeight, showError);
 
 
-  ball = Bodies.circle(150,60,100, ball_options)
-  World.add(world, ball);
 
-  glove = Bodies.rectangle(300,100,200,200);
-  World.add(world, glove);
-  glove.mousePressed(hForce);
-
-  cup = Bodies.rectangle(300,380,200,200);
-  World.add(world, cup);
-
-
-
+  textSize(20); 
 }
 
+// function to display UI
+function draw() {
+  background(bg);
 
+  if(keyDown(LEFT_ARROW)){
+    updateHeight(-10,0);
+    balloon.addAnimation("hotAirBalloon",balloonImage2);
+  }
+  else if(keyDown(RIGHT_ARROW)){
+    updateHeight(10,0);
+    balloon.addAnimation("hotAirBalloon",balloonImage2);
+  }
+  else if(keyDown(UP_ARROW)){
+    updateHeight(0,-10);
+    balloon.addAnimation("hotAirBalloon",balloonImage2);
+    balloon.scale=balloon.scale -0.005;
+  }
+  else if(keyDown(DOWN_ARROW)){
+    updateHeight(0,+10);
+    balloon.addAnimation("hotAirBalloon",balloonImage2);
+    balloon.scale=balloon.scale+0.005;
+  }
 
-
-function draw() 
-{
-  background(51);
-  image(backgroundimg, 0,0, displayWidth+80, displayHeight)
-  Engine.update(engine);
-
-  imageMode(CENTER);
-  image(ball_img, ball.position.x, ball.position.y, 100, 100);
-  image(glove_img, glove.position.x, glove.position.y, 200, 200);
-  image(cup_img, cup.position.x, cup.position.y, 200, 200);
-
-  collide()
-  hForce()
-  mousePressed()
-
-  drawSprites()
+  drawSprites();
+  fill(0);
+  stroke("white");
+  textSize(25);
+  text("**Use arrow keys to move Hot Air Balloon!",40,40);
 }
 
-function collide(cup, ball)
-{
-  World.remove(engine.world,ball, cup);
-}
+ function updateHeight(x,y){
+   database.ref('balloon/height').set({
+     'x': height.x + x ,
+     'y': height.y + y
+   })
+ }
 
-function hForce()
-{
-  Matter.Body.applyForce(ball,{x:0,y:0},{x:0.05,y:0});
+
+//CHOOSE THE CORRECT READHEIGHT FUNCTION
+ //function readHeight(data){
+   //balloon.x = height.x;
+   //balloon.y = height.y;
+ //}
+
+ function readHeight(data){
+  height = data.val();
+  balloon.x = height.x;
+  balloon.y = height.y;
+ }
+
+// function readHeight(data){
+//   height = data.val();
+// }
+
+// function readHeight(){
+//   height = val();
+//   balloon.x = height.x;
+//   balloon.y = height.y;
+// }
+
+function showError(){
+  console.log("Error in writing to the database");
 }
