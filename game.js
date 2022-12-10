@@ -132,10 +132,10 @@ class Game{
                       }
 
                       if(obstacleGroup.isTouching(players)){
-                        gameState = 0;
+                        //gameState = 0;
                         // gameState = 1;
                        // gameState = 2;
-                       // gameState = 3;
+                       gameState = 3;
                       }
                   }
                 }
